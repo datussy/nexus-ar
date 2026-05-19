@@ -1,4 +1,4 @@
-F<!DOCTYPE html>
+<!DOCTYPE html>
 <html>
 <head>
   <meta name="viewport" content="width=device-width, initial-scale=1" />
@@ -9,6 +9,7 @@ F<!DOCTYPE html>
   <style> body { margin: 0; overflow: hidden; } </style>
   
   <script>
+    // 1. Ép Camera không được cắt khoảng cách gần
     AFRAME.registerComponent('mindar-camera-fix', {
       tick: function () {
         var cam = this.el.sceneEl.camera;
@@ -19,6 +20,7 @@ F<!DOCTYPE html>
       }
     });
 
+    // 2. Fix lỗi thủng mô hình và hiển thị 2 mặt vật liệu
     AFRAME.registerComponent('fix-model-clipping', {
       init: function () {
         this.el.addEventListener('model-loaded', () => {
@@ -38,16 +40,15 @@ F<!DOCTYPE html>
       }
     });
 
-  AFRAME.registerComponent('swipe-rotate', {
+    // 3. Tương tác vuốt xoay 360 độ (Trục Y)
+    AFRAME.registerComponent('swipe-rotate', {
       init: function () {
         this.isDragging = false;
         this.previousX = 0;
-        this.previousY = 0;
         
         const onPointerDown = (e) => {
           this.isDragging = true;
           this.previousX = e.touches ? e.touches[0].screenX : e.clientX;
-          this.previousY = e.touches ? e.touches[0].screenY : e.clientY;
         };
         
         const onPointerUp = () => { this.isDragging = false; };
@@ -57,19 +58,11 @@ F<!DOCTYPE html>
           
           if (this.el.parentEl.object3D.visible) {
             const currentX = e.touches ? e.touches[0].screenX : e.clientX;
-            const currentY = e.touches ? e.touches[0].screenY : e.clientY;
-            
             const deltaX = currentX - this.previousX;
-            const deltaY = currentY - this.previousY;
             
-            // Xoay ngang (vuốt trái/phải)
-            this.el.object3D.rotation.z += deltaX * 0.01; 
-            
-            // Xoay dọc (vuốt lên/xuống)
-            this.el.object3D.rotation.x += deltaY * 0.01; 
-            
+            // Xoay theo trục Y
+            this.el.object3D.rotation.y += deltaX * 0.01; 
             this.previousX = currentX;
-            this.previousY = currentY;
           }
         };
 
@@ -79,8 +72,6 @@ F<!DOCTYPE html>
         window.addEventListener('touchend', onPointerUp);
         window.addEventListener('mousemove', onPointerMove);
         window.addEventListener('touchmove', onPointerMove);
-      }
-    });
       }
     });
   </script>
@@ -103,6 +94,7 @@ F<!DOCTYPE html>
     
     <a-camera position="0 0 0" look-controls="enabled: false"></a-camera>
     
+    <!-- NHÓM 1: 3 Target có mô hình chuyển động (Đã hạ scale xuống 0.3) -->
     <a-entity mindar-image-target="targetIndex: 0">
       <a-gltf-model fix-model-clipping src="#model_anim" position="0 -0.3 0" scale="0.3 0.3 0.3" animation-mixer="clip: *; loop: repeat"></a-gltf-model>
     </a-entity>
@@ -115,20 +107,31 @@ F<!DOCTYPE html>
       <a-gltf-model fix-model-clipping src="#model_anim" position="0 -0.3 0" scale="0.3 0.3 0.3" animation-mixer="clip: *; loop: repeat"></a-gltf-model>
     </a-entity>
 
+    <!-- NHÓM 2: 4 Target có mô hình tĩnh xoay được bằng tay -->
     <a-entity mindar-image-target="targetIndex: 3">
-      <a-gltf-model fix-model-clipping swipe-rotate src="#packaging_1" position="0 0 0" scale="0.5 0.5 0.5" rotation="90 0 0"></a-gltf-model>
+      <!-- Lớp ngoài: Nhận lệnh vuốt xoay -->
+      <a-entity swipe-rotate>
+        <!-- Lớp trong: Lật vuông góc 90 độ -->
+        <a-gltf-model fix-model-clipping src="#packaging_1" position="0 0 0" scale="0.5 0.5 0.5" rotation="90 0 0"></a-gltf-model>
+      </a-entity>
     </a-entity>
 
     <a-entity mindar-image-target="targetIndex: 4">
-      <a-gltf-model fix-model-clipping swipe-rotate src="#packaging_2" position="0 0 0" scale="0.5 0.5 0.5" rotation="90 0 0"></a-gltf-model>
+      <a-entity swipe-rotate>
+        <a-gltf-model fix-model-clipping src="#packaging_2" position="0 0 0" scale="0.5 0.5 0.5" rotation="90 0 0"></a-gltf-model>
+      </a-entity>
     </a-entity>
 
     <a-entity mindar-image-target="targetIndex: 5">
-      <a-gltf-model fix-model-clipping swipe-rotate src="#packaging_3" position="0 0 0" scale="0.5 0.5 0.5" rotation="90 0 0"></a-gltf-model>
+      <a-entity swipe-rotate>
+        <a-gltf-model fix-model-clipping src="#packaging_3" position="0 0 0" scale="0.5 0.5 0.5" rotation="90 0 0"></a-gltf-model>
+      </a-entity>
     </a-entity>
 
     <a-entity mindar-image-target="targetIndex: 6">
-      <a-gltf-model fix-model-clipping swipe-rotate src="#packaging_4" position="0 0 0" scale="0.5 0.5 0.5" rotation="90 0 0"></a-gltf-model>
+      <a-entity swipe-rotate>
+        <a-gltf-model fix-model-clipping src="#packaging_4" position="0 0 0" scale="0.5 0.5 0.5" rotation="90 0 0"></a-gltf-model>
+      </a-entity>
     </a-entity>
 
   </a-scene>
