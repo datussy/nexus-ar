@@ -38,14 +38,16 @@ F<!DOCTYPE html>
       }
     });
 
-    AFRAME.registerComponent('swipe-rotate', {
+  AFRAME.registerComponent('swipe-rotate', {
       init: function () {
         this.isDragging = false;
         this.previousX = 0;
+        this.previousY = 0;
         
         const onPointerDown = (e) => {
           this.isDragging = true;
           this.previousX = e.touches ? e.touches[0].screenX : e.clientX;
+          this.previousY = e.touches ? e.touches[0].screenY : e.clientY;
         };
         
         const onPointerUp = () => { this.isDragging = false; };
@@ -55,11 +57,19 @@ F<!DOCTYPE html>
           
           if (this.el.parentEl.object3D.visible) {
             const currentX = e.touches ? e.touches[0].screenX : e.clientX;
-            const deltaX = currentX - this.previousX;
+            const currentY = e.touches ? e.touches[0].screenY : e.clientY;
             
-            // Sử dụng trục Z để model quay đúng trục khi đã bị lật 90 độ ở trục X
-            this.el.object3D.rotation.y += deltaX * 0.01; 
+            const deltaX = currentX - this.previousX;
+            const deltaY = currentY - this.previousY;
+            
+            // Xoay ngang (vuốt trái/phải)
+            this.el.object3D.rotation.z += deltaX * 0.01; 
+            
+            // Xoay dọc (vuốt lên/xuống)
+            this.el.object3D.rotation.x += deltaY * 0.01; 
+            
             this.previousX = currentX;
+            this.previousY = currentY;
           }
         };
 
@@ -69,6 +79,8 @@ F<!DOCTYPE html>
         window.addEventListener('touchend', onPointerUp);
         window.addEventListener('mousemove', onPointerMove);
         window.addEventListener('touchmove', onPointerMove);
+      }
+    });
       }
     });
   </script>
