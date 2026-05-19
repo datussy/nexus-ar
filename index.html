@@ -58,7 +58,7 @@ F<!DOCTYPE html>
             const deltaX = currentX - this.previousX;
             
             // Sử dụng trục Z để model quay đúng trục khi đã bị lật 90 độ ở trục X
-            this.el.object3D.rotation.x += deltaX * 0.01; 
+            this.el.object3D.rotation.z += deltaX * 0.01; 
             this.previousX = currentX;
           }
         };
